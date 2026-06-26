@@ -129,3 +129,168 @@ When the user asks for a plotting prompt, adapt this template and replace every 
 ## Plot Requirements
 
 作图时，必须合理选取坐标比例，使图形本身尽量占满整张图纸，而不是只把坐标轴画满。需标明坐标轴名称、单位、数据点、拟合线；要标出数据点，但不要给每个点标注坐标值；必须画出拟合线，并在图中空白处写出拟合方程。在图片正上方标明图名；在图中空白处标明实验名称、学院、班级、姓名、日期，并用黑色线框框住这一部分信息。
+
+## Standard Matplotlib Plotting Code Reference
+
+The following is a standard Python (matplotlib) implementation for university physics experiment plots. Use this as a reference structure when generating plotting code. Make sure to adapt the data, labels, limits, and file paths.
+
+```python
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.font_manager import FontProperties
+from matplotlib.ticker import MultipleLocator
+
+ROOT = Path(__file__).resolve().parents[1]
+OUTPUT_DIR = ROOT / "outputs"
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+
+def chinese_font() -> FontProperties:
+    # Try common font paths to ensure Chinese characters render properly on various OS environments.
+    candidates = [
+        "/System/Library/AssetsV2/com_apple_MobileAsset_Font8/86ba2c91f017a3749571a82f2c6d890ac7ffb2fb.asset/AssetData/PingFang.ttc",
+        "/System/Library/Fonts/STHeiti Medium.ttc",
+        "/System/Library/Fonts/Supplemental/Songti.ttc",
+        "/System/Library/Fonts/Hiragino Sans GB.ttc",
+    ]
+    for candidate in candidates:
+        if Path(candidate).exists():
+            return FontProperties(fname=candidate)
+    return FontProperties()
+
+
+font = chinese_font()
+data = np.array(
+    [
+        (2.503, 0.0),
+        (2.798, 9.8),
+        (3.098, 19.6),
+        (3.390, 29.4),
+        (3.690, 39.2),
+        (3.985, 49.0),
+        (4.293, 58.8),
+        (4.598, 68.6),
+    ]
+)
+
+x = data[:, 0]
+y = data[:, 1]
+
+slope = 32.79
+intercept = -81.92
+x_fit = np.linspace(2.45, 4.65, 300)
+y_fit = slope * x_fit + intercept
+
+plt.rcParams.update(
+    {
+        "figure.dpi": 160,
+        "axes.unicode_minus": False,
+        "axes.edgecolor": "black",
+        "axes.linewidth": 1.1,
+        "xtick.direction": "in",
+        "ytick.direction": "in",
+        "xtick.major.size": 5,
+        "ytick.major.size": 5,
+        "xtick.minor.size": 3,
+        "ytick.minor.size": 3,
+    }
+)
+
+fig, ax = plt.subplots(figsize=(8.4, 6.0), constrained_layout=True)
+fig.patch.set_facecolor("white")
+ax.set_facecolor("white")
+
+ax.plot(
+    x_fit,
+    y_fit,
+    color="0.35",
+    linewidth=1.9,
+    linestyle="-",
+    label="最佳拟合直线",
+    zorder=2,
+)
+ax.scatter(
+    x,
+    y,
+    s=42,
+    marker="o",
+    facecolor="black",
+    edgecolor="black",
+    linewidth=0.8,
+    label="实验数据",
+    zorder=3,
+)
+
+ax.set_xlim(2.45, 4.65)
+ax.set_ylim(-5, 75)
+ax.xaxis.set_major_locator(MultipleLocator(0.20))
+ax.xaxis.set_minor_locator(MultipleLocator(0.10))
+ax.yaxis.set_major_locator(MultipleLocator(10))
+ax.yaxis.set_minor_locator(MultipleLocator(5))
+
+ax.grid(which="major", color="0.72", linewidth=0.65)
+ax.grid(which="minor", color="0.88", linewidth=0.45)
+ax.set_axisbelow(True)
+
+ax.set_title(
+    "F-x关系图（用作图法测金属丝弹性模量）",
+    fontproperties=font,
+    fontsize=17,
+    pad=18,
+)
+ax.set_xlabel("Δx / cm", fontsize=13)
+ax.set_ylabel("F / N", fontsize=13)
+
+for label in ax.get_xticklabels() + ax.get_yticklabels():
+    label.set_fontsize(10.5)
+
+ax.text(
+    3.76,
+    13.0,
+    r"$F = 32.79x - 81.92$",
+    fontsize=13,
+    bbox={
+        "boxstyle": "square,pad=0.25",
+        "facecolor": "white",
+        "edgecolor": "none",
+        "alpha": 0.92,
+    },
+)
+
+experiment_info = (
+    "实验名称：用拉伸法测量弹性模量\n"
+    "学院：物理与光电工程学院\n"
+    "班级：应用物理学1班\n"
+    "姓名：张三\n"
+    "日期：2026/06/01"
+)
+ax.text(
+    2.53,
+    72.0,
+    experiment_info,
+    fontproperties=font,
+    fontsize=10.8,
+    va="top",
+    ha="left",
+    linespacing=1.45,
+    bbox={
+        "boxstyle": "square,pad=0.45",
+        "facecolor": "white",
+        "edgecolor": "black",
+        "linewidth": 1.1,
+    },
+)
+
+for spine in ax.spines.values():
+    spine.set_color("black")
+    spine.set_linewidth(1.1)
+
+png_path = OUTPUT_DIR / "F-x关系图_金属丝弹性模量.png"
+pdf_path = OUTPUT_DIR / "F-x关系图_金属丝弹性模量.pdf"
+fig.savefig(png_path, dpi=300, bbox_inches="tight")
+fig.savefig(pdf_path, bbox_inches="tight")
+plt.close(fig)
+```
+
