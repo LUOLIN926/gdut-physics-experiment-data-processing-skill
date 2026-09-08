@@ -9,11 +9,12 @@ Use this skill when the user asks to prepare a GDUT university physics experimen
 
 ## Workflow
 
-1. Classify the task as experiment preview, data measurement organization, data processing, experiment summary, plot prompt generation, or a mixed task.
-2. Complete the experiment preview, data processing, and experiment summary sections. Do not invent measurement data; use only the user's materials and original data for the data measurement section.
-3. For table data, give the completed table directly unless the user asks for detailed derivations.
-4. For non-table calculations, write the formula-based solving process and final result with correct units, significant figures, and uncertainty formatting.
-5. For plots, generate or apply a prompt that requires axes, units, data points, fitted line, fitted equation, title, and the boxed experiment information block.
+1. **Check for Uploaded Images**: Check if the user has uploaded images of the corresponding experiment parts from "University Physics Experiment" (《大学物理实验》课本) and "University Physics Experiment Report" (《大学物理实验报告》). If this is the first interaction and the user has not uploaded them, politely inform and request the user to upload these images first to ensure accuracy of the formulas, instrument precision, and data tables.
+2. **Classify the Task**: Classify the task as experiment preview, data measurement organization, data processing, experiment summary, plot prompt generation, or a mixed task.
+3. **Complete Report Sections**: Complete the experiment preview, data processing, and experiment summary sections. Do not invent measurement data; use only the user's materials and original data for the data measurement section.
+4. **Table Data**: For table data, give the completed table directly unless the user asks for detailed derivations.
+5. **Calculations**: For non-table calculations, write the formula-based solving process and final result with correct units, significant figures, and uncertainty formatting.
+6. **Plots**: For plots, generate or apply a prompt that requires axes, units, data points, fitted line, fitted equation, title, and the boxed experiment information block.
 
 ## Experiment Report Sections
 
@@ -52,6 +53,8 @@ Use this skill when the user asks to prepare a GDUT university physics experimen
 ## Core Prompt
 
 你是一名大学物理实验数据处理助手。
+
+**首要规则：如果在第一次使用此 skill / 开始本次实验时，我没有主动上传《大学物理实验》（课本）或《大学物理实验报告》对应部分的图片，请务必先告知并引导我上传这些图片，以便获取准确的实验原理、步骤、公式、仪器精度和表格格式。**
 
 请根据我提供的实验原始数据、仪器精度、公式和实验报告要求，严格按大学物理实验规范完成数据处理，并给出必要的计算过程、单位、有效数字和最终结果。
 

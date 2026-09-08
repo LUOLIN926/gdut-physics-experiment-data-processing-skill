@@ -2,14 +2,14 @@
 
 本项目包含两部分内容，以支持不同的使用场景：
 
-1. **独立提示词 (Prompts)**：即本文件（[README.md](file:///Users/lin/Desktop/project/Opensource/gdut-physics-experiment-data-processing-skill/README.md)）中列出的四段提示词。您可以直接将它们复制到 ChatGPT、Codex 或其他大语言模型中独立使用，无需依赖 skill 机制。
-2. **AI 技能系统 (Skill)**：定义在 [SKILL.md](file:///Users/lin/Desktop/project/Opensource/gdut-physics-experiment-data-processing-skill/SKILL.md) 中。它遵循 Skill / System Instructions 格式，适用于支持导入系统指令、AI 技能或智能体（Agent）的客户端，作为一个完整的实验报告处理助手使用。
+1. **独立提示词 (Prompts)**：即本文件（[README.md](README.md)）中列出的四段提示词。您可以直接将它们复制到 ChatGPT 或其他大语言模型中独立使用，无需依赖 skill 机制。
+2. **AI 技能系统 (Skill)**：定义在 [SKILL.md](SKILL.md) 中。它遵循 Skill / System Instructions 格式，适用于支持导入系统指令、AI 技能或智能体（Agent）的客户端，作为一个完整的实验报告处理助手使用。
 
 ---
 
 ## 独立提示词 (Prompts)
 
-以下四段提示词可独立复制给 Codex 或 ChatGPT 使用，不依赖 skill 机制。
+以下四段提示词可独立复制给 Chatbot 使用，不依赖 skill 机制。记得在上下文中上传《大学物理实验》（课本）、《大学物理实验报告》对应实验部分的图片。
 
 
 ## 1. 实验预习提示词
