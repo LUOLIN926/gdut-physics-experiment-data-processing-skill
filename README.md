@@ -1,18 +1,125 @@
 # GDUT 大学物理实验数据处理助手 (GDUT Physics Experiment Data Processing)
 
-本项目包含两部分内容，以支持不同的使用场景：
+本项目专为**广东工业大学（GDUT）大学物理实验报告**编写与数据处理设计，涵盖实验预习、数据测量整理、数据处理（公式推导、有效数字、不确定度）、符合规范的黑白打印实验图表绘制以及实验总结。
 
-1. **独立提示词 (Prompts)**：即本文件（[README.md](README.md)）中列出的四段提示词。您可以直接将它们复制到 ChatGPT 或其他大语言模型中独立使用，无需依赖 skill 机制。
-2. **AI 技能系统 (Skill)**：定义在 [SKILL.md](SKILL.md) 中。它遵循 Skill / System Instructions 格式，适用于支持导入系统指令、AI 技能或智能体（Agent）的客户端，作为一个完整的实验报告处理助手使用。
+本项目全面遵循 **AgentSkills** 规范，同时完美适配 **OpenAI Codex**、**OpenClaw** 以及普通的 **Web Chatbot（ChatGPT、Claude、Kimi 等）**。
 
 ---
 
-## 独立提示词 (Prompts)
+## 目录
 
-以下四段提示词可独立复制给 Chatbot 使用，不依赖 skill 机制。记得在上下文中上传《大学物理实验》（课本）、《大学物理实验报告》对应实验部分的图片。
+- [目录结构](#目录结构)
+- [多平台使用指南](#多平台使用指南)
+  - [1. OpenAI Codex 适配与使用](#1-openai-codex-适配与使用)
+  - [2. OpenClaw 适配与使用](#2-openclaw-适配与使用)
+  - [3. 独立 Python 作图脚本](#3-独立-python-作图脚本)
+- [独立提示词 (Prompts - 适用于普通 Chatbot)](#独立提示词-prompts---适用于普通-chatbot)
+  - [1. 实验预习提示词](#1-实验预习提示词)
+  - [2. 数据处理（表格+计算）提示词](#2-数据处理表格计算提示词)
+  - [3. 数据处理（作图）提示词](#3-数据处理作图提示词)
+  - [4. 实验总结提示词](#4-实验总结提示词)
+- [大学物理实验规范要点](#大学物理实验规范要点)
 
+---
 
-## 1. 实验预习提示词
+## 目录结构
+
+```text
+gdut-physics-experiment-data-processing-skill/
+├── SKILL.md                 # 核心技能定义，遵循 AgentSkills 标准，适配 Codex & OpenClaw
+├── agents/
+│   └── openai.yaml          # Codex 专用 UI 元数据、展示名与调用策略
+├── scripts/
+│   └── plot_experiment.py   # 跨平台自适应中文字体、黑白打印风格的标准大物作图脚本
+├── README.md                # 完整使用说明与独立提示词
+└── .gitignore
+```
+
+---
+
+## 多平台使用指南
+
+### 1. OpenAI Codex 适配与使用
+
+在 Codex CLI / IDE 环境中，该技能支持**代码直出**——Codex 会直接调用或参考 `scripts/plot_experiment.py` 生成符合 GDUT 物理实验报告规范的高清图表（PNG 和矢量 PDF），并保存至 `outputs/`。
+
+#### 安装方式
+
+通过软链接将本目录添加到 Codex 的全局技能目录：
+
+```bash
+mkdir -p ~/.codex/skills
+ln -s "$(pwd)" ~/.codex/skills/gdut-physics-experiment-data-processing
+```
+
+#### 调用方式
+
+- **显式调用**：在提示词中输入 `$gdut-physics-experiment-data-processing`，例如：
+  > `$gdut-physics-experiment-data-processing 帮我完成金属丝拉伸法测弹性模量的数据处理并画出 F-x 图`
+- **隐式触发**：直接提问关于广东工业大学大学物理实验报告、不确定度计算或作图需求，Codex 会根据 `SKILL.md` 的描述自动触发。
+
+---
+
+### 2. OpenClaw 适配与使用
+
+OpenClaw 是一款支持多通道（飞书、Telegram、Discord、Web 等）的个人 AI 智能体框架。本项目符合 OpenClaw AgentSkills 标准。
+
+#### 安装方式
+
+**方式 A：通过 OpenClaw CLI 安装（推荐）**
+
+```bash
+openclaw skills install . --as gdut-physics-experiment-data-processing
+```
+
+**方式 B：软链接至 OpenClaw 工作区技能目录**
+
+```bash
+mkdir -p ~/.openclaw/workspace/skills
+ln -s "$(pwd)" ~/.openclaw/workspace/skills/gdut-physics-experiment-data-processing
+```
+
+#### 检查与验证
+
+运行以下命令确认技能已就绪并对模型可见：
+
+```bash
+# 验证 SKILL.md 规范合法性
+python3 /opt/homebrew/lib/node_modules/openclaw/skills/skill-creator/scripts/quick_validate.py .
+
+# 查看技能详情与就绪状态
+openclaw skills info gdut-physics-experiment-data-processing
+openclaw skills check
+```
+
+#### 交互使用
+
+在绑定的任一聊天客户端（如飞书、Telegram）或 OpenClaw 终端中发送实验数据或课本图片，Agent 即可自动激活该技能并协助处理实验报告。
+
+---
+
+### 3. 独立 Python 作图脚本
+
+技能内附带经过严谨调优的作图工具 [`scripts/plot_experiment.py`](scripts/plot_experiment.py)，具有以下特性：
+- **跨平台中文自适应**：智能检测 macOS（PingFang/STHeiti）、Windows（SimHei/微软雅黑）、Linux（Noto Sans CJK/文泉驿），彻底避免方块乱码。
+- **大物实验专用格式**：黑白高对比度、刻度向内（`in`）、主次刻度与精细网格、右上角/左上角黑色线框实验信息卡、拟合方程与最佳拟合直线。
+- **双格式输出**：自动导出适合插入电子报告的 300 DPI PNG 与适合打印出版的矢量 PDF。
+
+#### 快速测试
+
+```bash
+python3 scripts/plot_experiment.py --demo
+```
+
+生成的演示图表位于 `outputs/F-x关系图_金属丝弹性模量.png` 与 `.pdf`。
+
+---
+
+## 独立提示词 (Prompts - 适用于普通 Chatbot)
+
+如果您在网页端（如 ChatGPT、Claude、Kimi 等）使用且无法运行 Agent 技能，可以直接复制以下四段提示词。记得在对话中一并上传《大学物理实验》（课本）和《大学物理实验报告》对应页面的图片。
+
+### 1. 实验预习提示词
 
 ```text
 你是一名大学物理实验报告助手。请根据我提供的实验材料和实验报告要求，完成大学物理实验报告中的“实验预习”部分。
@@ -45,7 +152,7 @@
 {根据材料和报告要求整理}
 ```
 
-## 2. 数据处理（表格+计算）提示词
+### 2. 数据处理（表格+计算）提示词
 
 ```text
 你是一名大学物理实验数据处理助手。请根据我提供的实验原始数据、仪器精度、公式和实验报告要求，严格按大学物理实验规范完成数据处理，并给出必要的计算过程、单位、有效数字和最终结果。
@@ -97,12 +204,12 @@
 4. 最终输出必须与实验报告格式一致，即仅填充实验报告。
 ```
 
-## 3. 数据处理（作图）提示词
+### 3. 数据处理（作图）提示词
 
-先将这段提示词发给chatbot
+先将这段提示词发给 Chatbot：
 
 ```text
-你是一名大学物理实验数据处理助手。请根据我提供的实验数据和作图要求，生成一段可直接交给 Codex 执行的 Python（matplotlib）作图提示词，用于绘制大学物理实验报告风格的作图法图表。
+你是一名大学物理实验数据处理助手。请根据我提供的实验数据和作图要求，生成一段可直接交给 Codex / Python 执行的 matplotlib 作图提示词，用于绘制大学物理实验报告风格的作图法图表。
 
 作图总要求：
 1. 必须合理选取坐标比例，使图形本身尽量占满整张图纸，而不是只把坐标轴画满。
@@ -140,9 +247,9 @@
 注意：一定要通过python代码的形式输出图片，而不是使用图片生成能力。
 ```
 
-再把chatbot输出的prompt输入给Codex这类的agent
+再把 Chatbot 输出的 prompt 输入给 Codex 或直接在本地 Python 环境中执行。
 
-## 4. 实验总结提示词
+### 4. 实验总结提示词
 
 ```text
 你是一名大学物理实验报告助手。请根据以上已经完成的实验报告内容，简要总结本实验。
@@ -164,3 +271,11 @@
 * 处理方法：{说明数据记录与处理方法，如逐差法、作图法、最小二乘法、误差分析等。}
 * 实验结论：{写出主要测量结果、相对误差或结果合理性评价；没有最终结果时保留待填项，不虚构数值。}
 ```
+
+---
+
+## 大学物理实验规范要点
+
+1. **直接读数估读**：必须在仪器最小分度后再估读一位，如最小刻度为 $1\text{ mm}$ 的直尺，测量值必须记录到 $0.1\text{ mm}$（即 $0.01\text{ cm}$）。
+2. **修约法则**：“四舍六入五看奇偶”，尾数小于 5 舍去，大于 5 进位；尾数恰为 5 时看前一位，前一位奇数进位，偶数舍去；5 后有非零数则进位。
+3. **误差对齐**：绝对误差通常保留 1 位有效数字，最佳值的末位必须严格与绝对误差所在位数对齐。

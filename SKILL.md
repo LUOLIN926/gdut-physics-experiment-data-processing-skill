@@ -1,6 +1,8 @@
 ---
 name: gdut-physics-experiment-data-processing
-description: Use when preparing Guangdong University of Technology university physics experiment reports, including experiment preview sections, data processing, significant figures and uncertainty, result tables, experiment summaries, and Codex/matplotlib prompts for formal lab-report plots.
+description: "Use when preparing Guangdong University of Technology (GDUT) physics experiment reports, including preview sections, data calculation, uncertainty evaluation, significant figures, result tables, experiment summaries, and generating matplotlib lab-report plots."
+metadata:
+  short-description: "GDUT 大学物理实验预习、数据处理与作图助手"
 ---
 
 # GDUT University Physics Experiment Data Processing
@@ -10,11 +12,13 @@ Use this skill when the user asks to prepare a GDUT university physics experimen
 ## Workflow
 
 1. **Check for Uploaded Images**: Check if the user has uploaded images of the corresponding experiment parts from "University Physics Experiment" (《大学物理实验》课本) and "University Physics Experiment Report" (《大学物理实验报告》). If this is the first interaction and the user has not uploaded them, politely inform and request the user to upload these images first to ensure accuracy of the formulas, instrument precision, and data tables.
-2. **Classify the Task**: Classify the task as experiment preview, data measurement organization, data processing, experiment summary, plot prompt generation, or a mixed task.
+2. **Classify the Task**: Classify the task as experiment preview, data measurement organization, data processing, experiment summary, plot generation / prompt, or a mixed task.
 3. **Complete Report Sections**: Complete the experiment preview, data processing, and experiment summary sections. Do not invent measurement data; use only the user's materials and original data for the data measurement section.
 4. **Table Data**: For table data, give the completed table directly unless the user asks for detailed derivations.
 5. **Calculations**: For non-table calculations, write the formula-based solving process and final result with correct units, significant figures, and uncertainty formatting.
-6. **Plots**: For plots, generate or apply a prompt that requires axes, units, data points, fitted line, fitted equation, title, and the boxed experiment information block.
+6. **Plots**:
+   - **Codex / OpenClaw (Code Execution Environment)**: Run or adapt `scripts/plot_experiment.py` (or execute a customized Python matplotlib script) to directly render 300 DPI PNG & vector PDF charts into `outputs/`.
+   - **Chatbot (Text-Only Environment)**: Output the specialized plotting prompt (from the template below) or Python code snippet for the user to execute.
 
 ## Experiment Report Sections
 
@@ -135,7 +139,15 @@ When the user asks for a plotting prompt, adapt this template and replace every 
 
 ## Standard Matplotlib Plotting Code Reference
 
-The following is a standard Python (matplotlib) implementation for university physics experiment plots. Use this as a reference structure when generating plotting code. Make sure to adapt the data, labels, limits, and file paths.
+The skill provides a turnkey plotting script at `scripts/plot_experiment.py` supporting cross-platform Chinese font rendering and standard physics experiment plot formatting.
+
+Agents (Codex, OpenClaw) can directly execute or import it:
+```bash
+python scripts/plot_experiment.py --demo
+```
+or import `from scripts.plot_experiment import plot_lab_chart`.
+
+Below is the standard Python (matplotlib) reference implementation. Use this structure when generating or adapting plotting code for the user's specific experiment:
 
 ```python
 from pathlib import Path
@@ -296,4 +308,3 @@ fig.savefig(png_path, dpi=300, bbox_inches="tight")
 fig.savefig(pdf_path, bbox_inches="tight")
 plt.close(fig)
 ```
-

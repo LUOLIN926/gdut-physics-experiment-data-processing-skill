@@ -1,0 +1,7 @@
+interface:
+  display_name: "GDUT 物理实验数据处理"
+  short_description: "大物实验报告预习、数据处理、不确定度计算与黑白图表生成"
+  default_prompt: "使用 $gdut-physics-experiment-data-processing 帮我完成大学物理实验报告预习与数据处理。"
+
+policy:
+  allow_implicit_invocation: true
